@@ -1,0 +1,6 @@
+[submodule "douyin-downloader"]
+	path = douyin-downloader
+	url = git@github.com:wengyedong/douyin-downloader.git
+[submodule "video-script-extractor"]
+	path = video-script-extractor
+	url = git@github.com:wengyedong/video-script-extractor.git
