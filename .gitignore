@@ -39,3 +39,6 @@ dist/
 # 其他
 *.tmp
 *.temp
+
+# 工作目录
+.trae/
