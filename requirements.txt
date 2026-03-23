@@ -1,0 +1,14 @@
+# 抖音视频收藏工具依赖项
+
+# 抖音下载器依赖
+requests
+beautifulsoup4
+tqdm
+
+# 视频文案提取器依赖
+faster-whisper
+tqdm
+torch
+
+# 系统依赖（需要单独安装）
+# ffmpeg - 用于音频提取

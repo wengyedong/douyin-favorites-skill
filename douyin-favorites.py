@@ -4,6 +4,10 @@ import sys
 import argparse
 import json
 from pathlib import Path
+import shutil
+from datetime import datetime
+
+
 
 # 添加子模块路径到系统路径
 sys.path.append(os.path.join(os.path.dirname(__file__), 'douyin-downloader'))
@@ -27,13 +31,6 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='抖音视频收藏工具')
     parser.add_argument('url', help='抖音视频链接')
     return parser.parse_args()
-
-# 确保 temp 目录存在
-def ensure_temp_dir():
-    temp_dir = os.path.join(os.path.dirname(__file__), 'temp')
-    if not os.path.exists(temp_dir):
-        os.makedirs(temp_dir)
-    return temp_dir
 
 # 检索最新的视频文件和 JSON 信息文件
 def find_latest_files(temp_dir):
@@ -67,13 +64,23 @@ def find_latest_files(temp_dir):
     return latest_video, latest_json
 
 if __name__ == '__main__':
-    args = parse_arguments()
+    """主函数"""
+    # 解析命令行参数
+    parser = argparse.ArgumentParser(description="抖音视频收藏工具")
+    parser.add_argument("url", help="抖音视频链接")
+    parser.add_argument("--output-dir", dest="output_dir", help="指定输出目录路径", default=os.path.join(os.path.dirname(__file__), 'output'))
+    args = parser.parse_args()
+
     print(f"抖音视频链接: {args.url}")
+    print(f"输出目录: {args.output_dir}")
     
-    # 确保 temp 目录存在
-    temp_dir = ensure_temp_dir()
+    # 清除临时目录（如果存在），并创建新的 temp 目录
+    temp_dir = os.path.join(os.path.dirname(__file__), 'temp')
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)
+    os.makedirs(temp_dir)
     print(f"临时目录: {temp_dir}")
-    
+
     # 下载视频
     print("开始下载视频...")
     try:
@@ -96,11 +103,46 @@ if __name__ == '__main__':
     if json_file:
         print(f"找到 JSON 信息文件: {json_file}")
     
+    # 解析 JSON 信息文件
+    with open(json_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        title = data.get('title', '无标题')
+        print(f"视频标题: {title}")
+        duration = data.get('duration', '无时长')
+        print(f"视频时长: {duration}")
+        tiktok_id = data.get('tiktok_id', '无抖音 ID')
+        print(f"抖音 ID: {tiktok_id}")
+        original_url = data.get('original_url', '无原始链接')
+        print(f"原始链接: {original_url}")
+
+    video_dir = os.path.dirname(video_file)
+    output_dir = os.path.join(args.output_dir, tiktok_id)
+
     # 提取视频文案
     print("开始提取视频文案...")
     try:
-        video_extractor(video_file, temp_dir)
+        video_extractor(video_file, video_dir)
         print("视频文案提取完成")
     except Exception as e:
         print(f"文案提取失败: {e}")
+        sys.exit(1)
+
+    # 拷贝结果（video_dir）到输出目录，如果目录已存在则提示用户，并增加时间戳
+    if os.path.exists(output_dir):
+        print(f"输出目录已存在: {output_dir}")
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        output_dir = os.path.join(args.output_dir, f"{tiktok_id}_{timestamp}")
+        print(f"调整输出目录为: {output_dir}")
+    print(f"开始拷贝结果到 {output_dir}...")
+    shutil.copytree(video_dir, output_dir)
+    print("结果拷贝完成")
+    print(f"结果已保存到: {output_dir}")
+
+    # 清除临时目录
+    try:
+        print(f"开始清除临时目录 {temp_dir}...")
+        shutil.rmtree(temp_dir)
+        print("临时目录已清除")
+    except Exception as e:
+        print(f"清除临时目录失败: {e}")
         sys.exit(1)

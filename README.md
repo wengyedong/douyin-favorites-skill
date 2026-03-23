@@ -39,7 +39,18 @@ git submodule update --init --recursive
 
 ### 2. 安装依赖
 
-#### 安装子模块依赖
+#### 方法一：直接安装主项目依赖（推荐）
+
+主项目已提供合并后的 `requirements.txt` 文件，包含所有子模块的依赖：
+
+```bash
+pip install -r requirements.txt
+
+# 或使用国内源加速
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+#### 方法二：单独安装子模块依赖
 
 ```bash
 # 安装抖音下载器依赖
@@ -57,9 +68,48 @@ cd ..
 
 **ffmpeg**（视频文案提取需要）：
 
-- **Windows**：从 [ffmpeg 官网](https://ffmpeg.org/download.html) 下载，解压并将 `bin` 目录添加到系统环境变量 `PATH`
-- **Linux**：`apt update && apt install ffmpeg`（Ubuntu/Debian）
-- **macOS**：`brew install ffmpeg`
+##### Windows 安装步骤
+
+1. 访问 [ffmpeg 官网](https://ffmpeg.org/download.html) 下载 Windows 版本
+2. 选择 "Windows builds from gyan.dev" 或 "Windows builds from BtbN"
+3. 下载最新的静态版本（static build）
+4. 解压下载的压缩包到任意目录，例如 `C:\ffmpeg`
+5. 将 `C:\ffmpeg\bin` 目录添加到系统环境变量 `PATH`：
+   - 右键点击 "此电脑" → "属性" → "高级系统设置" → "环境变量"
+   - 在 "系统变量" 中找到 "Path"，点击 "编辑"
+   - 点击 "新建"，输入 `C:\ffmpeg\bin`（根据实际解压路径调整）
+   - 点击 "确定" 保存所有更改
+6. 验证安装：打开命令提示符，输入 `ffmpeg -version`，如果显示版本信息则安装成功
+
+##### Linux 安装步骤
+
+**Ubuntu/Debian**：
+```bash
+apt update && apt install ffmpeg -y
+```
+
+**CentOS/RHEL**：
+```bash
+yum install epel-release -y
+yum install ffmpeg ffmpeg-devel -y
+```
+
+**验证安装**：
+```bash
+ffmpeg -version
+```
+
+##### macOS 安装步骤
+
+**使用 Homebrew**：
+```bash
+brew install ffmpeg
+```
+
+**验证安装**：
+```bash
+ffmpeg -version
+```
 
 ## 使用方法
 
